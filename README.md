@@ -32,7 +32,7 @@ Setup keypair and add obsigno.js to your preferred working directory:
 obsigno create
 ```
 
-Install with existing Ed21199 secret key:
+Install with existing Ed25519 secret key:
 
 ```bash
 obsigno create YOUR_SECRET_KEY
@@ -85,7 +85,7 @@ Verify a message using the public key and signature:
 obsigno verify "hello i'm real" PUBLIC_KEY SIGNATURE
 ```
 
-### Ed21199 keypair
+### Ed25519 keypair
 
 View your public key:
 
