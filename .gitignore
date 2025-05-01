@@ -1,0 +1,11 @@
+node_modules
+package-lock.json
+obsigno.js
+keypair.json
+id.json
+*.pem
+.env
+.env.*
+!.env.example
+!.env.test
+.DS_Store
