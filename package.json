@@ -1,0 +1,29 @@
+{
+	"name": "obsigno",
+	"version": "0.1.0",
+	"license": "MIT",
+	"author": "Sam Larsen",
+	"description": "Use obsigno to easily sign, verify, and create custom messages",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sahelars/obsigno"
+	},
+	"main": "index.js",
+	"bin": {
+		"obsigno": "./bin/cli.js"
+	},
+	"scripts": {
+		"test": "mocha",
+		"lint": "prettier --use-tabs --trailing-comma 'none' --check .",
+		"format": "prettier --use-tabs --trailing-comma 'none' --write ."
+	},
+	"dependencies": {
+		"bs58": "^6.0.0",
+		"dotenv": "^16.5.0"
+	},
+	"devDependencies": {
+		"chai": "^4.5.0",
+		"mocha": "^10.7.0",
+		"prettier": "^3.2.5"
+	}
+}
