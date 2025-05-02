@@ -12,7 +12,7 @@ Edit a single javascript file to quickly review and sign large messages. No comp
 
 ## Persistent storage
 
-When `obsigno create` is run, a keypair is saved to the home directory as ~/.obsigno/ed25519-pub.pem and ~/.obsigno/ed25519-priv.pem. The file for obsigno.js is added in the current terminal directory.
+When `obsigno create` is run, a keypair is saved to the home directory as ~/.obsigno/ed25519-pub.pem, ~/.obsigno/ed25519-priv.pem, and ~/.obsigno/ed25519-pub.base58. The file for obsigno.js is added in the current terminal directory.
 
 ## Install
 
@@ -36,6 +36,12 @@ Install with existing Ed25519 secret key:
 
 ```bash
 obsigno create YOUR_SECRET_KEY
+```
+
+Install with existing keypair.json file:
+
+```bash
+obsigno create keypair.json
 ```
 
 ### 2. (Optional) Modify obsigno.js
