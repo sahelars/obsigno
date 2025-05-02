@@ -1,23 +1,32 @@
 declare module "obsigno" {
 	/**
-	 * Views the package import path.
-	 * @returns {string} - Package import path result.
+	 * Returns the resolved package import path.
+	 *
+	 * @returns {string} The package import path.
 	 */
 	export function importPath(): string;
 
 	/**
-	 * Formats an input string or Buffer to a Uint8Array.
-	 * @param {Uint8Array|Buffer|string} input - Input to format.
-	 * @returns {Uint8Array} - Uint8Array result.
+	 * Converts a Buffer or string into a Uint8Array.
+	 *
+	 * @param {Buffer|string} input - The input data to convert.
+	 * @returns {Uint8Array} A Uint8Array representing the input.
 	 */
-	export function formatUint8Array(
-		input: Uint8Array | Buffer | string
-	): Uint8Array;
+	export function toUint8Array(input: Buffer | string): Uint8Array;
 
 	/**
-	 * Formats an input Uint8Array or Buffer to a base58 string.
-	 * @param {Uint8Array|Buffer|string} input - Input to format.
-	 * @returns {string} - Base58 string result.
+	 * Encodes binary data (Uint8Array or Buffer) into a Base58 string.
+	 *
+	 * @param {Uint8Array|Buffer} input - The binary data to encode.
+	 * @returns {string} The encoded Base58 string.
 	 */
-	export function formatBase58(input: Uint8Array | Buffer | string): string;
+	export function encodeBase58(input: Uint8Array | Buffer): string;
+
+	/**
+	 * Decodes a Base58-encoded string into a Uint8Array.
+	 *
+	 * @param {string} input - The Base58 string to decode.
+	 * @returns {Uint8Array} The decoded binary data.
+	 */
+	export function decodeBase58(input: string): Uint8Array;
 }
