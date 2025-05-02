@@ -17,7 +17,7 @@ describe("Certify tests", () => {
 		expect(signature).to.have.length(64);
 		const signatureBs58 = Certify.signMessage({
 			message: messageString,
-			privateKey: Utils.formatBase58(keypair.privateKey)
+			privateKey: Utils.encodeBase58(keypair.privateKey)
 		});
 		expect(signatureBs58).to.have.length(64);
 		const signatureCustomMessage = Certify.signMessage({
@@ -39,7 +39,7 @@ describe("Certify tests", () => {
 			signature: signature
 		});
 		expect(verified).to.be.true;
-		const wrongPublicKey = "9Ehq7uaT68QTw2u6eVh4iKfs54zEU1MjELqVhWtJ6T5Y";
+		const wrongPublicKey = Keypair.generateRandomKeypair().publicKey;
 		const failVerified = Certify.verifyMessage({
 			message: messageString,
 			publicKey: wrongPublicKey,
@@ -61,7 +61,7 @@ describe("Certify tests", () => {
 		expect(verified).to.be.true;
 		const verifiedBs58 = Certify.verifyMessage({
 			message: messageString,
-			publicKey: Utils.formatBase58(keypair.publicKey),
+			publicKey: Utils.encodeBase58(keypair.publicKey),
 			signature: signature
 		});
 		expect(verifiedBs58).to.be.true;

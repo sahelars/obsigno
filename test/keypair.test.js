@@ -19,8 +19,8 @@ describe("Keypair tests", () => {
 	});
 
 	it("should expect keypair from secret key", () => {
-		const secretKey = Keypair.keypair();
-		const keypair = Keypair.keypair(secretKey.secretKey);
+		const keys = Keypair.generateRandomKeypair();
+		const keypair = Keypair.keypair(keys.secretKey);
 		expect(keypair.publicKey).to.have.length(
 			32,
 			"Public key Uint8Array should be 32 bytes"
