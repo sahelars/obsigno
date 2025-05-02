@@ -2,7 +2,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const os = require("os");
 const path = require("path");
-const { formatUint8Array } = require("../utils/utils");
+const { toUint8Array } = require("../utils/utils");
 
 const homeDir = os.homedir();
 const keyDir = path.join(homeDir, ".obsigno");
@@ -15,9 +15,7 @@ const encodeKey = ({ publicKey, privateKey }) => {
 		console.log("Requires either publicKey or privateKey");
 		return;
 	}
-	const key = privateKey
-		? formatUint8Array(privateKey)
-		: formatUint8Array(publicKey);
+	const key = privateKey ? toUint8Array(privateKey) : toUint8Array(publicKey);
 	const identifier = Buffer.from(
 		privateKey
 			? "302e020100300506032b657004220420"
@@ -58,7 +56,7 @@ function signMessage({ message, privateKey }) {
 }
 
 function verifyMessage({ message, publicKey, signature }) {
-	const signatureBuffer = formatUint8Array(signature);
+	const signatureBuffer = toUint8Array(signature);
 	const msgBuffer = Buffer.from(message, "utf8");
 	const key = crypto.createPublicKey(encodeKey({ publicKey: publicKey }));
 	return crypto.verify(null, msgBuffer, key, signatureBuffer);

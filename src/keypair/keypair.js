@@ -2,7 +2,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const os = require("os");
 const path = require("path");
-const { formatUint8Array, formatBase58 } = require("../utils/utils");
+const { toUint8Array, encodeBase58 } = require("../utils/utils");
 
 const homeDir = os.homedir();
 const keyDir = path.join(homeDir, ".obsigno");
@@ -14,7 +14,7 @@ const pubBase58Path = path.join(keyDir, "ed25519-pub.base58");
 
 function keypair(secretKey) {
 	if (secretKey) {
-		const secretKeyBuffer = formatUint8Array(secretKey);
+		const secretKeyBuffer = toUint8Array(secretKey);
 		const privateKey = secretKeyBuffer.subarray(0, 32);
 		const publicKey = secretKeyBuffer.subarray(32, 64);
 		return {
@@ -55,7 +55,7 @@ function createKeypair(secretKey) {
 		console.log(`      ${privateKeyPath}`);
 		return false;
 	} else if (secretKey && !secretKey.includes(".json")) {
-		const secretKeyBuffer = formatUint8Array(secretKey);
+		const secretKeyBuffer = toUint8Array(secretKey);
 		const privateKeyBytes = secretKeyBuffer.subarray(0, 32);
 		const publicKeyBytes = secretKeyBuffer.subarray(32, 64);
 		const privateKeyDer = crypto.createPrivateKey({
@@ -87,7 +87,7 @@ function createKeypair(secretKey) {
 			type: "spki"
 		});
 		const publicKeyFormat = new Uint8Array(publicKeyDerFormat.subarray(-32));
-		fs.writeFileSync(pubBase58Path, formatBase58(publicKeyFormat));
+		fs.writeFileSync(pubBase58Path, encodeBase58(publicKeyFormat));
 	} else if (secretKey && secretKey.includes(".json")) {
 		if (!fs.existsSync(secretKey)) {
 			console.log(`${secretKey} does not exist`);
@@ -127,7 +127,7 @@ function createKeypair(secretKey) {
 			type: "spki"
 		});
 		const publicKeyFormat = new Uint8Array(publicKeyDer.subarray(-32));
-		fs.writeFileSync(pubBase58Path, formatBase58(publicKeyFormat));
+		fs.writeFileSync(pubBase58Path, encodeBase58(publicKeyFormat));
 	} else {
 		const { privateKey, publicKey } = crypto.generateKeyPairSync("ed25519");
 		fs.writeFileSync(
@@ -143,11 +143,33 @@ function createKeypair(secretKey) {
 			type: "spki"
 		});
 		const publicKeyFormat = new Uint8Array(publicKeyDer.subarray(-32));
-		fs.writeFileSync(pubBase58Path, formatBase58(publicKeyFormat));
+		fs.writeFileSync(pubBase58Path, encodeBase58(publicKeyFormat));
 	}
 	console.log(`      ${publicKeyPath}`);
 	console.log(`      ${privateKeyPath}`);
 	return true;
 }
 
-module.exports = { keypair, createKeypair };
+function generateRandomKeypair() {
+	const { privateKey, publicKey } = crypto.generateKeyPairSync("ed25519");
+	const privateKeyDer = privateKey.export({
+		format: "der",
+		type: "pkcs8"
+	});
+	const publicKeyDer = publicKey.export({
+		format: "der",
+		type: "spki"
+	});
+	const publicKeyFormat = new Uint8Array(publicKeyDer.subarray(-32));
+	const privateKeyFormat = new Uint8Array(privateKeyDer.subarray(-32));
+	const secretKeyFormat = new Uint8Array(
+		Buffer.concat([Buffer.from(privateKeyFormat), Buffer.from(publicKeyFormat)])
+	);
+	return {
+		publicKey: publicKeyFormat,
+		privateKey: privateKeyFormat,
+		secretKey: secretKeyFormat
+	};
+}
+
+module.exports = { keypair, createKeypair, generateRandomKeypair };

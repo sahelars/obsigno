@@ -3,11 +3,12 @@
 const {
 	keypair,
 	createKeypair,
+	generateRandomKeypair,
 	reviewMessage,
 	signMessage,
 	verifyMessage,
 	importPath,
-	formatBase58
+	encodeBase58
 } = require("../index.js");
 const path = require("path");
 const packageJson = require("../package.json");
@@ -55,11 +56,11 @@ switch (command) {
 			const secretKey = args.find((arg, index) => index > 0);
 			const keys = secretKey ? keypair(secretKey) : keypair();
 			if (flags.public) {
-				console.log(`\n  Public key:   ${formatBase58(keys.publicKey)}\n`);
+				console.log(`\n  Public key:   ${encodeBase58(keys.publicKey)}\n`);
 			} else if (flags.private) {
-				console.log(`\n  Private key:  ${formatBase58(keys.privateKey)}\n`);
+				console.log(`\n  Private key:  ${encodeBase58(keys.privateKey)}\n`);
 			} else if (flags.secret) {
-				console.log(`\n  Secret key:   ${formatBase58(keys.secretKey)}\n`);
+				console.log(`\n  Secret key:   ${encodeBase58(keys.secretKey)}\n`);
 			} else {
 				console.log(
 					"\n  Usage: obsigno keypair <--public|--private|--secret> [secret key]\n"
@@ -126,10 +127,10 @@ switch (command) {
 			if (signature) {
 				if (args[1]) {
 					console.log(`\n  Message:    ${message}`);
-					console.log(`  Signature:  ${formatBase58(signature)}\n`);
+					console.log(`  Signature:  ${encodeBase58(signature)}\n`);
 				} else {
 					console.log(
-						`\n  ----------------------------------------------------------------------------  ${message}\n  Signature:    ${formatBase58(signature)}\n  ----------------------------------------------------------------------------\n`
+						`\n  ----------------------------------------------------------------------------  ${message}\n  Signature:    ${encodeBase58(signature)}\n  ----------------------------------------------------------------------------\n`
 					);
 				}
 			} else {
@@ -158,6 +159,13 @@ switch (command) {
 				"\n  🚧 Issue verifying signature. Make sure public key and signature are valid.\n"
 			);
 		}
+		break;
+
+	case "random":
+		const keys = generateRandomKeypair();
+		console.log(
+			`\n  Public key:   ${encodeBase58(keys.publicKey)}\n  Private key:  ${encodeBase58(keys.privateKey)}\n  Secret key:   ${encodeBase58(keys.secretKey)}\n`
+		);
 		break;
 
 	case "path":
@@ -194,6 +202,9 @@ switch (command) {
 		);
 		console.log(
 			"    verify <message> <public key> <signature>             - Verify signature"
+		);
+		console.log(
+			"    random                                                - Generate random keypair"
 		);
 		console.log(
 			"    path                                                  - Local import path"

@@ -1,35 +1,89 @@
 const path = require("path");
-const { default: bs58 } = require("bs58");
 
 const projectRoot = path.resolve(__dirname, "../..");
 const obsignoPath = path.join(projectRoot, "index.js");
+
+const BASE58_ALPHABET =
+	"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 function importPath() {
 	return obsignoPath;
 }
 
-const formatUint8Array = (input) => {
+const toUint8Array = (input) => {
 	if (input instanceof Uint8Array) {
 		return input;
 	} else if (Buffer.isBuffer(input)) {
 		return new Uint8Array(input);
 	} else if (typeof input === "string") {
-		return bs58.decode(input);
+		return decodeBase58(input);
 	} else {
 		console.log("Invalid input");
-		return;
+		return null;
 	}
 };
 
-const formatBase58 = (input) => {
-	if (input instanceof Uint8Array) {
-		return bs58.encode(input);
-	} else if (Buffer.isBuffer(input)) {
-		return bs58.encode(input);
-	} else {
-		console.log("Invalid input");
-		return;
+function encodeBase58(input) {
+	if (!(input instanceof Uint8Array) && !Buffer.isBuffer(input)) {
+		console.log("Input must be a Uint8Array or Buffer");
+		return null;
 	}
-};
+	let digits = [0];
+	for (let i = 0; i < input.length; ++i) {
+		let carry = input[i];
+		for (let j = 0; j < digits.length; ++j) {
+			carry += digits[j] << 8;
+			digits[j] = carry % 58;
+			carry = (carry / 58) | 0;
+		}
+		while (carry > 0) {
+			digits.push(carry % 58);
+			carry = (carry / 58) | 0;
+		}
+	}
+	for (let k = 0; k < input.length && input[k] === 0; ++k) {
+		digits.push(0);
+	}
+	return digits
+		.reverse()
+		.map((d) => BASE58_ALPHABET[d])
+		.join("");
+}
 
-module.exports = { importPath, formatUint8Array, formatBase58 };
+function decodeBase58(input) {
+	const BASE58_MAP = {};
+	for (let i = 0; i < BASE58_ALPHABET.length; i++) {
+		BASE58_MAP[BASE58_ALPHABET[i]] = i;
+	}
+	if (typeof input !== "string") {
+		console.log("Input must be a Base58-encoded string");
+		return null;
+	}
+	let bytes = [0];
+	for (let i = 0; i < input.length; i++) {
+		const char = input[i];
+		const value = BASE58_MAP[char];
+		if (value === undefined) {
+			console.log(`Invalid Base58 character '${char}'`);
+			return null;
+		}
+
+		let carry = value;
+		for (let j = 0; j < bytes.length; j++) {
+			carry += bytes[j] * 58;
+			bytes[j] = carry & 0xff;
+			carry >>= 8;
+		}
+
+		while (carry > 0) {
+			bytes.push(carry & 0xff);
+			carry >>= 8;
+		}
+	}
+	for (let k = 0; k < input.length && input[k] === "1"; k++) {
+		bytes.push(0);
+	}
+	return new Uint8Array(bytes.reverse());
+}
+
+module.exports = { importPath, toUint8Array, encodeBase58, decodeBase58 };
