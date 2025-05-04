@@ -1,4 +1,4 @@
-I, $PUBLIC_KEY, hereby certify and notarize this message.
+I, $PUBLIC_KEY, am requesting access.
 
 Signed: $CURRENT_DATE
 Expires: $EXPIRES_IN_0H5M33S
