@@ -3,4 +3,4 @@ I, $PUBLIC_KEY, hereby certify and notarize this message.
 Signed: $CURRENT_DATE
 Expires: $EXPIRES_IN_0H5M33S
 
-Access Code: $ACCESS_CODE
+$ACCESS_CODE
