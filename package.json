@@ -1,6 +1,6 @@
 {
 	"name": "obsigno",
-	"version": "0.1.3",
+	"version": "0.2.0",
 	"description": "Use obsigno to easily sign, verify, and create custom messages",
 	"license": "MIT",
 	"author": "Sam Larsen",

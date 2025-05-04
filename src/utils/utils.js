@@ -1,14 +1,5 @@
-const path = require("path");
-
-const projectRoot = path.resolve(__dirname, "../..");
-const obsignoPath = path.join(projectRoot, "index.js");
-
 const BASE58_ALPHABET =
 	"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-function importPath() {
-	return obsignoPath;
-}
 
 const toUint8Array = (input) => {
 	if (input instanceof Uint8Array) {
@@ -23,7 +14,7 @@ const toUint8Array = (input) => {
 	}
 };
 
-function encodeBase58(input) {
+const encodeBase58 = (input) => {
 	if (!(input instanceof Uint8Array) && !Buffer.isBuffer(input)) {
 		console.log("Input must be a Uint8Array or Buffer");
 		return null;
@@ -48,9 +39,9 @@ function encodeBase58(input) {
 		.reverse()
 		.map((d) => BASE58_ALPHABET[d])
 		.join("");
-}
+};
 
-function decodeBase58(input) {
+const decodeBase58 = (input) => {
 	const BASE58_MAP = {};
 	for (let i = 0; i < BASE58_ALPHABET.length; i++) {
 		BASE58_MAP[BASE58_ALPHABET[i]] = i;
@@ -84,6 +75,6 @@ function decodeBase58(input) {
 		bytes.push(0);
 	}
 	return new Uint8Array(bytes.reverse());
-}
+};
 
-module.exports = { importPath, toUint8Array, encodeBase58, decodeBase58 };
+module.exports = { toUint8Array, encodeBase58, decodeBase58 };

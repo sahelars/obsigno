@@ -1,7 +1,7 @@
 const { expect } = require("chai");
-const Keypair = require("../src/keypair/keypair.js");
-const Certify = require("../src/certify/certify.js");
-const Utils = require("../src/utils/utils.js");
+const Keypair = require("../src/keypair/keypair");
+const Certify = require("../src/certify/certify");
+const Utils = require("../src/utils/utils");
 
 const updatingInterval = 3600000;
 const timestamp = Date.now() + updatingInterval;
