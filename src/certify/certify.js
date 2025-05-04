@@ -18,7 +18,7 @@ function reviewMessage(filePath = paths.obsignoPath) {
 	}
 }
 
-function retrieveSignedMessage(filePath) {
+function retrieveSignedMessage(filePath = paths.obsignoPath) {
 	try {
 		let currentFilePath = resolvePath(filePath);
 		const fileContent = fs.readFileSync(currentFilePath, "utf8");
@@ -48,9 +48,9 @@ function retrieveSignedMessage(filePath) {
 		const publicKey = publicKeyMatch ? publicKeyMatch[1] : null;
 
 		return {
+			publicKey,
 			message,
-			signature,
-			publicKey
+			signature
 		};
 	} catch (e) {
 		console.log(e.message);
@@ -78,15 +78,15 @@ function signMessage({ message, privateKey }) {
 	}
 }
 
-function verifyMessage({ filePath, message, publicKey, signature }) {
+function verifyMessage({ filePath, publicKey, message, signature }) {
 	try {
-		let currentMessage = message;
 		let currentPublicKey = publicKey;
+		let currentMessage = message;
 		let currentSignature = signature;
 		if (filePath) {
 			const retrievedMessage = retrieveSignedMessage(filePath);
-			currentMessage = retrievedMessage.message;
 			currentPublicKey = retrievedMessage.publicKey;
+			currentMessage = retrievedMessage.message;
 			currentSignature = retrievedMessage.signature;
 		}
 		const signatureBuffer = toUint8Array(currentSignature);
