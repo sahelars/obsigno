@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const fs = require("fs");
 const {
 	keypair,
 	addNewKeypair,
@@ -140,11 +141,18 @@ switch (command) {
 				const messageStart = `\n----- START MESSAGE -----\n`;
 				const message = `${msg}`;
 				const messageEnd = `\n----- END MESSAGE -----\n`;
+				const pubkeyStart = `\n----- START PUBLIC KEY -----\n`;
+				const pubkey = `${encodeBase58(keys.publicKey)}`;
+				const pubkeyEnd = `\n----- END PUBLIC KEY -----\n`;
 				const signatureStart = `\n----- START SIGNATURE -----\n`;
 				const signatureBase58 = `${encodeBase58(signature)}`;
 				const signatureEnd = `\n----- END SIGNATURE -----\n`;
-				const signedMessage = `${messageStart}${message}${messageEnd}${signatureStart}${signatureBase58}${signatureEnd}`;
+				const signedMessage = `${messageStart}${message}${messageEnd}${pubkeyStart}${pubkey}${pubkeyEnd}${signatureStart}${signatureBase58}${signatureEnd}`;
 				console.log(signedMessage);
+				fs.writeFileSync(
+					path.join(process.cwd(), "signed.txt"),
+					signedMessage.trim()
+				);
 			} else {
 				console.log("\n  ❌ Signing failed.\n");
 			}
@@ -198,13 +206,13 @@ switch (command) {
 			"    keypair <--public|--private|--secret> [secret key]    - View keypair"
 		);
 		console.log(
-			"    review [message]                                      - Review file message"
+			"    review [message.txt file]                             - Review file message"
 		);
 		console.log(
-			"    sign [message]                                        - Sign message"
+			"    sign [message.txt file]                               - Sign message"
 		);
 		console.log(
-			"    verify <message> <public key> <signature>             - Verify signature"
+			"    verify <message.txt file> <public key> <signature>    - Verify signature"
 		);
 		console.log(
 			"    random                                                - Generate keypair"

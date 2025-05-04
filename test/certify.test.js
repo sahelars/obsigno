@@ -38,8 +38,9 @@ describe("Certify tests", () => {
 			publicKey: keypair.publicKey,
 			signature: signature
 		});
+
 		expect(verified).to.be.true;
-		const wrongPublicKey = Keypair.generateRandomKeypair().publicKey;
+		const wrongPublicKey = Keypair.generateKeypair().publicKey;
 		const failVerified = Certify.verifyMessage({
 			message: messageString,
 			publicKey: wrongPublicKey,
