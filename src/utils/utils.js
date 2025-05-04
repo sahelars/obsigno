@@ -43,7 +43,7 @@ const interpretMessage = (filePath) => {
 		const expirationMs =
 			hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
 		const expirationDate = new Date(timestamp + expirationMs).toISOString();
-		const accessCode = `${timestamp}?expires=${timestamp + expirationMs}`;
+		const accessCode = `?public_key=${publicKey}&signed_at=${timestamp}&expires_at=${timestamp + expirationMs}`;
 		let interpretedContent = content
 			.replace(/\$PUBLIC_KEY/g, publicKey)
 			.replace(/\$CURRENT_DATE/g, currentDate)

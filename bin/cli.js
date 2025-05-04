@@ -114,10 +114,14 @@ switch (command) {
 		const filePath = args.find((arg, index) => index > 0);
 		const reviewMsg = filePath ? reviewMessage(filePath) : reviewMessage();
 		if (reviewMsg) {
+			const keys = keypair();
+			const pubkeyStart = `\n----- START PUBLIC KEY -----\n`;
+			const pubkey = `${encodeBase58(keys.publicKey)}`;
+			const pubkeyEnd = `\n----- END PUBLIC KEY -----\n`;
 			const messageStart = `\n----- START MESSAGE -----\n`;
 			const message = `${reviewMsg}`;
 			const messageEnd = `\n----- END MESSAGE -----\n`;
-			const reviewMessage = `${messageStart}${message}${messageEnd}`;
+			const reviewMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}`;
 			console.log(reviewMessage);
 		} else {
 			console.log("\n  ❌ Message not found.\n");
@@ -137,16 +141,16 @@ switch (command) {
 				privateKey: keys.privateKey
 			});
 			if (signature) {
-				const messageStart = `\n----- START MESSAGE -----\n`;
-				const message = `${msg}`;
-				const messageEnd = `\n----- END MESSAGE -----\n`;
 				const pubkeyStart = `\n----- START PUBLIC KEY -----\n`;
 				const pubkey = `${encodeBase58(keys.publicKey)}`;
 				const pubkeyEnd = `\n----- END PUBLIC KEY -----\n`;
+				const messageStart = `\n----- START MESSAGE -----\n`;
+				const message = `${msg}`;
+				const messageEnd = `\n----- END MESSAGE -----\n`;
 				const signatureStart = `\n----- START SIGNATURE -----\n`;
 				const signatureBase58 = `${encodeBase58(signature)}`;
 				const signatureEnd = `\n----- END SIGNATURE -----\n`;
-				const signedMessage = `${messageStart}${message}${messageEnd}${pubkeyStart}${pubkey}${pubkeyEnd}${signatureStart}${signatureBase58}${signatureEnd}`;
+				const signedMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}${signatureStart}${signatureBase58}${signatureEnd}`;
 				console.log(signedMessage);
 				fs.writeFileSync(
 					path.join(process.cwd(), "signed.txt"),

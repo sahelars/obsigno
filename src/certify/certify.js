@@ -29,15 +29,6 @@ function retrieveSignedMessage(filePath) {
 		const messageMatch = fileContent.match(messageRegex);
 		const message = messageMatch ? messageMatch[1] : null;
 
-		const publicKeyStart = "----- START PUBLIC KEY -----\n";
-		const publicKeyEnd = "\n----- END PUBLIC KEY -----";
-		const publicKeyRegex = new RegExp(
-			`${publicKeyStart}(.*?)${publicKeyEnd}`,
-			"s"
-		);
-		const publicKeyMatch = fileContent.match(publicKeyRegex);
-		const publicKey = publicKeyMatch ? publicKeyMatch[1] : null;
-
 		const signatureStart = "----- START SIGNATURE -----\n";
 		const signatureEnd = "\n----- END SIGNATURE -----";
 		const signatureRegex = new RegExp(
@@ -47,10 +38,19 @@ function retrieveSignedMessage(filePath) {
 		const signatureMatch = fileContent.match(signatureRegex);
 		const signature = signatureMatch ? signatureMatch[1] : null;
 
+		const publicKeyStart = "----- START PUBLIC KEY -----\n";
+		const publicKeyEnd = "\n----- END PUBLIC KEY -----";
+		const publicKeyRegex = new RegExp(
+			`${publicKeyStart}(.*?)${publicKeyEnd}`,
+			"s"
+		);
+		const publicKeyMatch = fileContent.match(publicKeyRegex);
+		const publicKey = publicKeyMatch ? publicKeyMatch[1] : null;
+
 		return {
 			message,
-			publicKey,
-			signature
+			signature,
+			publicKey
 		};
 	} catch (e) {
 		console.log(e.message);
