@@ -36,10 +36,7 @@ declare module "obsigno" {
 	 * @param {string} filePath - Path to the file to be read
 	 * @returns {Object} Object with interpreted variables and the template content
 	 */
-	export function readAndInterpretMessageFile(
-		filePath: string,
-		publicKeyPath: string
-	): {
+	export function interpretMessage(filePath: string): {
 		content: string;
 		variables: Record<string, string>;
 		template: string;

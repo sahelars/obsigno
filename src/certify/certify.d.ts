@@ -2,9 +2,22 @@ declare module "obsigno" {
 	/**
 	 * Loads the custom message from the obsigno.js file.
 	 *
+	 * @param {string} [filePath] - The path to the message txt file.
 	 * @returns {string} The configured message.
 	 */
-	export function reviewMessage(): string;
+	export function reviewMessage(filePath?: string): string;
+
+	/**
+	 * Retrieves a signed message from the obsigno.js file.
+	 *
+	 * @param {string} [filePath] - The path to the message txt file.
+	 * @returns {Object} The signed message.
+	 */
+	export function retrieveSignedMessage(filePath?: string): {
+		message: string;
+		publicKey: Uint8Array;
+		signature: Uint8Array;
+	};
 
 	/**
 	 * Signs a message using the Ed25519 private key.
@@ -24,14 +37,16 @@ declare module "obsigno" {
 	 * Verifies a signed message using an Ed25519 public key.
 	 *
 	 * @param {Object} params - Verification options.
-	 * @param {string} params.message - The original message.
+	 * @param {string} [params.filePath] - The path to the message txt file.
 	 * @param {Uint8Array|Buffer|string} params.publicKey - The public key that should match the signature.
+	 * @param {string} params.message - The original message.
 	 * @param {Uint8Array|Buffer|string} params.signature - The signature to verify.
 	 * @returns {boolean} Whether the signature is valid.
 	 */
 	export function verifyMessage(params: {
+		filePath?: string;
+		publicKey: Uint8Array | Buffer | string;
 		message: string;
-		publicKey?: Uint8Array | Buffer | string;
 		signature: Uint8Array | Buffer | string;
 	}): boolean;
 }
