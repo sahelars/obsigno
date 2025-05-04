@@ -2,7 +2,7 @@
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sahelars/obsigno/blob/master/LICENSE.md)
 
-### Use obsigno to easily sign, verify, and create custom messages
+### Use obsigno to easily sign, verify, and write custom messages
 
 Edit a single javascript file to quickly review and sign large messages. No complex setup needed.
 
