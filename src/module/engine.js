@@ -43,7 +43,7 @@ function readAndInterpretFile(filePath, publicKeyPath) {
 		const expirationMs =
 			hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
 		const expirationDate = new Date(Date.now() + expirationMs).toISOString();
-		const accessCode = `/${Date.now()}/${expirationMs}`;
+		const accessCode = `${Date.now()}?expires=${expirationMs}`;
 
 		let interpretedContent = content
 			.replace(/\$PUBLIC_KEY/g, publicKey)

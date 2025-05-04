@@ -114,11 +114,15 @@ switch (command) {
 		const filePath = args.find((arg, index) => index > 0);
 		const reviewMsg = filePath ? reviewMessage(filePath) : reviewMessage();
 		if (reviewMsg) {
-			console.log(reviewMsg);
+			const messageStart = `\n----- START MESSAGE -----\n`;
+			const message = `${reviewMsg}`;
+			const messageEnd = `\n----- END MESSAGE -----\n`;
+			const reviewMessage = `${messageStart}${message}${messageEnd}`;
+			console.log(reviewMessage);
 		} else {
-			console.log("\n  ❌ Review message not found.\n");
+			console.log("\n  ❌ Message not found.\n");
 			console.log(
-				"\n  🚧 Run 'obsigno create' to add obsigno.js file to your current directory.\n"
+				"\n  🚧 Run 'obsigno create --message' to add obsigno.txt file to your current directory.\n"
 			);
 		}
 		break;
@@ -126,39 +130,28 @@ switch (command) {
 	case "sign":
 		try {
 			const keys = keypair();
-			let message;
-			if (args[1]) {
-				message = args[1];
-			} else {
-				try {
-					const { obsignoCertify } = require(obsignoPath);
-					message = obsignoCertify;
-				} catch (e) {
-					console.log(
-						"\n  🚧 obsigno.js not found. Run 'obsigno create' to create it.\n"
-					);
-					return;
-				}
-			}
+			const filePath = args[1] && args[1].includes(".txt") ? args[1] : null;
+			const msg = filePath ? reviewMessage(filePath) : reviewMessage();
 			const signature = signMessage({
-				message,
+				message: msg,
 				privateKey: keys.privateKey
 			});
 			if (signature) {
-				if (args[1]) {
-					console.log(`\n  Message:    ${message}`);
-					console.log(`  Signature:  ${encodeBase58(signature)}\n`);
-				} else {
-					console.log(
-						`\n  ----------------------------------------------------------------------------  ${message}\n  Signature:    ${encodeBase58(signature)}\n  ----------------------------------------------------------------------------\n`
-					);
-				}
+				const messageStart = `\n----- START MESSAGE -----\n`;
+				const message = `${msg}`;
+				const messageEnd = `\n----- END MESSAGE -----\n`;
+				const signatureStart = `\n----- START SIGNATURE -----\n`;
+				const signatureBase58 = `${encodeBase58(signature)}`;
+				const signatureEnd = `\n----- END SIGNATURE -----\n`;
+				const signedMessage = `${messageStart}${message}${messageEnd}${signatureStart}${signatureBase58}${signatureEnd}`;
+				console.log(signedMessage);
 			} else {
 				console.log("\n  ❌ Signing failed.\n");
 			}
 		} catch (e) {
 			console.log(
-				"\n  🚧 Signing failure. Run 'obsigno' to troubleshoot.\n\n" + e
+				"\n  🚧 Signing failure. Run 'obsigno review' to troubleshoot message.\n\n" +
+					e
 			);
 		}
 		break;
