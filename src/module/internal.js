@@ -21,7 +21,7 @@ const paths = {
 };
 
 const resolvePath = (filePath) => {
-	if (!filePath.includes("/")) {
+	if (filePath && !filePath.includes("/")) {
 		return path.join(process.cwd(), filePath);
 	}
 	return filePath;

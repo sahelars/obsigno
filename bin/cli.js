@@ -14,8 +14,6 @@ const { paths } = require("../src/module/internal");
 const path = require("path");
 const packageJson = require("../package.json");
 
-const obsignoPath = path.join(process.cwd(), "obsigno.js");
-
 function parseArgs() {
 	const args = process.argv.slice(2);
 	const flags = {};
@@ -106,7 +104,8 @@ switch (command) {
 			}
 		} catch (e) {
 			console.log(
-				"\n  🚧 Issue generating keypair. Make sure secret key is 64 bytes.\n"
+				"\n  🚧 Issue generating keypair. Make sure secret key is 64 bytes.\n" +
+					e.message
 			);
 		}
 		break;
@@ -159,17 +158,16 @@ switch (command) {
 		} catch (e) {
 			console.log(
 				"\n  🚧 Signing failure. Run 'obsigno review' to troubleshoot message.\n\n" +
-					e
+					e.message
 			);
 		}
 		break;
 
 	case "verify":
 		try {
-			const message = args[1];
-			const publicKey = args[2];
-			const signature = args[3];
-			const verified = verifyMessage({ message, publicKey, signature });
+			const filePath =
+				args[1] && args[1].includes(".txt") ? args[1] : "signed.txt";
+			const verified = verifyMessage({ filePath });
 			if (verified) {
 				console.log("\n  ✅ Signature verified.\n");
 			} else {
@@ -177,7 +175,8 @@ switch (command) {
 			}
 		} catch (e) {
 			console.log(
-				"\n  🚧 Issue verifying signature. Make sure public key and signature are valid.\n"
+				"\n  🚧 Issue verifying signature. Make sure public key and signature are valid.\n" +
+					e.message
 			);
 		}
 		break;
@@ -206,13 +205,13 @@ switch (command) {
 			"    keypair <--public|--private|--secret> [secret key]    - View keypair"
 		);
 		console.log(
-			"    review [message.txt file]                             - Review file message"
+			"    review [obsigno.txt file path]                        - Review file message"
 		);
 		console.log(
-			"    sign [message.txt file]                               - Sign message"
+			"    sign [obsigno.txt file path]                          - Sign message"
 		);
 		console.log(
-			"    verify <message.txt file> <public key> <signature>    - Verify signature"
+			"    verify [obsigno.txt file path]                        - Verify signature"
 		);
 		console.log(
 			"    random                                                - Generate keypair"
