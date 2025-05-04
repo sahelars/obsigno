@@ -1,65 +1,109 @@
 const fs = require("fs");
 const crypto = require("crypto");
-const os = require("os");
-const path = require("path");
-const { toUint8Array } = require("../utils/utils");
+const { toUint8Array, interpretMessage } = require("../utils/utils");
+const {
+	paths,
+	resolvePath,
+	readData,
+	formatToPEM
+} = require("../module/internal");
 
-const homeDir = os.homedir();
-const keyDir = path.join(homeDir, ".obsigno");
-if (!fs.existsSync(keyDir)) fs.mkdirSync(keyDir, { recursive: true });
-const privateKeyPath = path.join(keyDir, "ed25519-priv.pem");
-const obsignoPath = path.join(process.cwd(), "obsigno.js");
-
-const encodeKey = ({ publicKey, privateKey }) => {
-	if (!publicKey && !privateKey) {
-		console.log("Requires either publicKey or privateKey");
-		return;
+function reviewMessage(filePath = paths.obsignoPath) {
+	try {
+		const message = interpretMessage(filePath);
+		return message.content;
+	} catch (e) {
+		console.log(e.message);
+		return null;
 	}
-	const key = privateKey ? toUint8Array(privateKey) : toUint8Array(publicKey);
-	const identifier = Buffer.from(
-		privateKey
-			? "302e020100300506032b657004220420"
-			: "302a300506032b6570032100",
-		"hex"
-	);
-	const keyBuffer = Buffer.concat([identifier, key]);
-	const type = privateKey ? "PRIVATE" : "PUBLIC";
-	const pemKey =
-		`-----BEGIN ${type} KEY-----\n` +
-		keyBuffer.toString("base64") +
-		`\n-----END ${type} KEY-----`;
-	return pemKey;
-};
+}
 
-function reviewMessage() {
-	if (fs.existsSync(obsignoPath)) {
-		try {
-			const { obsignoMessage } = require(obsignoPath);
-			return obsignoMessage;
-		} catch (e) {
-			console.log(e);
-		}
+function retrieveSignedMessage(filePath) {
+	try {
+		let currentFilePath = resolvePath(filePath);
+		const fileContent = fs.readFileSync(currentFilePath, "utf8");
+
+		const messageStart = "----- START MESSAGE -----\n";
+		const messageEnd = "\n----- END MESSAGE -----";
+		const messageRegex = new RegExp(`${messageStart}(.*?)${messageEnd}`, "s");
+		const messageMatch = fileContent.match(messageRegex);
+		const message = messageMatch ? messageMatch[1] : null;
+
+		const signatureStart = "----- START SIGNATURE -----\n";
+		const signatureEnd = "\n----- END SIGNATURE -----";
+		const signatureRegex = new RegExp(
+			`${signatureStart}(.*?)${signatureEnd}`,
+			"s"
+		);
+		const signatureMatch = fileContent.match(signatureRegex);
+		const signature = signatureMatch ? signatureMatch[1] : null;
+
+		const publicKeyStart = "----- START PUBLIC KEY -----\n";
+		const publicKeyEnd = "\n----- END PUBLIC KEY -----";
+		const publicKeyRegex = new RegExp(
+			`${publicKeyStart}(.*?)${publicKeyEnd}`,
+			"s"
+		);
+		const publicKeyMatch = fileContent.match(publicKeyRegex);
+		const publicKey = publicKeyMatch ? publicKeyMatch[1] : null;
+
+		return {
+			message,
+			signature,
+			publicKey
+		};
+	} catch (e) {
+		console.log(e.message);
+		return null;
 	}
-	return null;
 }
 
 function signMessage({ message, privateKey }) {
-	const msgBuffer = Buffer.from(message, "utf8");
-	let key;
-	if (privateKey) {
-		key = crypto.createPrivateKey(encodeKey({ privateKey: privateKey }));
-	} else {
-		key = crypto.createPrivateKey(fs.readFileSync(privateKeyPath, "utf8"));
+	try {
+		const msgBuffer = Buffer.from(message, "utf8");
+		let key;
+		if (privateKey) {
+			key = crypto.createPrivateKey(formatToPEM({ privateKey: privateKey }));
+		} else {
+			const keypair = readData();
+			key = crypto.createPrivateKey(
+				formatToPEM({ privateKey: keypair.privateKey })
+			);
+		}
+		const signature = crypto.sign(null, msgBuffer, key);
+		return new Uint8Array(signature);
+	} catch (e) {
+		console.log(e.message);
+		return null;
 	}
-	const signature = crypto.sign(null, msgBuffer, key);
-	return new Uint8Array(signature);
 }
 
-function verifyMessage({ message, publicKey, signature }) {
-	const signatureBuffer = toUint8Array(signature);
-	const msgBuffer = Buffer.from(message, "utf8");
-	const key = crypto.createPublicKey(encodeKey({ publicKey: publicKey }));
-	return crypto.verify(null, msgBuffer, key, signatureBuffer);
+function verifyMessage({ filePath, message, publicKey, signature }) {
+	try {
+		let currentMessage = message;
+		let currentPublicKey = publicKey;
+		let currentSignature = signature;
+		if (filePath) {
+			const retrievedMessage = retrieveSignedMessage(filePath);
+			currentMessage = retrievedMessage.message;
+			currentPublicKey = retrievedMessage.publicKey;
+			currentSignature = retrievedMessage.signature;
+		}
+		const signatureBuffer = toUint8Array(currentSignature);
+		const msgBuffer = Buffer.from(currentMessage, "utf8");
+		const key = crypto.createPublicKey(
+			formatToPEM({ publicKey: currentPublicKey })
+		);
+		return crypto.verify(null, msgBuffer, key, signatureBuffer);
+	} catch (e) {
+		console.log(e.message);
+		return null;
+	}
 }
 
-module.exports = { reviewMessage, signMessage, verifyMessage };
+module.exports = {
+	reviewMessage,
+	retrieveSignedMessage,
+	signMessage,
+	verifyMessage
+};

@@ -1,10 +1,10 @@
-# obsigno.js
+# obsigno
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sahelars/obsigno/blob/master/LICENSE.md)
 
-### Use obsigno to easily sign, verify, and create custom messages
+### Use obsigno to easily sign, verify, and write custom messages
 
-Edit a single javascript file to quickly review and sign large messages. No complex setup needed.
+Edit a single txt file to quickly review and sign large messages. No complex setup needed.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Edit a single javascript file to quickly review and sign large messages. No comp
 
 ## Persistent storage
 
-When `obsigno create` is run, a keypair is saved to the home directory as ~/.obsigno/ed25519-pub.pem, ~/.obsigno/ed25519-priv.pem, and ~/.obsigno/ed25519-pub.base58. The file for obsigno.js is added in the current terminal directory.
+When `obsigno create --keypair` is run, a keypair is saved to the home directory as ~/.local/share/obsigno/data.json and ~/.config/obsigno/id.bin. The file for obsigno.txt is added in the current terminal directory when `obsigno create --message` is run.
 
 ## Install
 
@@ -22,51 +22,81 @@ Install obsigno globally with npm:
 npm install -g obsigno
 ```
 
-## Setup message
+## Setup
 
-### 1. Add obsigno.js
+### 1. Add Ed25519 keypair
 
-Setup keypair and add obsigno.js to your preferred working directory:
-
-```bash
-obsigno create
-```
-
-Install with existing Ed25519 secret key:
+Add new keypair:
 
 ```bash
-obsigno create YOUR_SECRET_KEY
+obsigno create --keypair
 ```
 
-Install with existing keypair.json file:
+Or add existing secret key:
 
 ```bash
-obsigno create keypair.json
+obsigno create --keypair YOUR_SECRET_KEY
 ```
 
-### 2. (Optional) Modify obsigno.js
+### 2. Add obsigno.txt file
 
-Create a custom message by modifying obsigno.js:
+Add obsigno.txt to your preferred working directory:
 
-```js
-const message = "Hello, world!";
-const review = `${message} (UNCERTIFIED)`;
+```bash
+obsigno create --message
+```
 
-// REQUIRED: `obsignoMessage` AND `obsignoCertify`
-module.exports = {
-	obsignoMessage: review,
-	obsignoCertify: message
-};
+### 3. (Optional) Modify obsigno.txt
+
+Create a custom message by modifying obsigno.txt:
+
+```
+I, $PUBLIC_KEY, hereby certify and notarize this message.
+
+Signed: $CURRENT_DATE
+Expires: $EXPIRES_IN_0H5M33S
+
+$ACCESS_CODE
+```
+
+Returns the pubic key:
+
+```
+$PUBLIC_KEY
+```
+
+Returns the current date:
+
+```
+$CURRENT_DATE
+```
+
+Returns the expiration date:
+
+```
+$EXPIRES_IN_12H0M0S
+```
+
+Returns a URL-safe access code extension:
+
+```
+$ACCESS_CODE
 ```
 
 ## Usage
 
 ### Review message
 
-Review the obsigno.js message before signing:
+Review the obsigno.txt message before signing:
 
 ```bash
 obsigno review
+```
+
+Review a custom message.txt file before signing:
+
+```bash
+obsigno review message.txt
 ```
 
 ### Sign message
@@ -77,18 +107,24 @@ Sign the message:
 obsigno sign
 ```
 
-Sign a custom input message:
+Sign a custom message.txt file:
 
 ```bash
-obsigno sign "hello i'm real"
+obsigno sign message.txt
 ```
 
 ### Verify message
 
-Verify a message using the public key and signature:
+Verify a signed message:
 
 ```bash
-obsigno verify "hello i'm real" PUBLIC_KEY SIGNATURE
+obsigno verify
+```
+
+Verify a signed.txt file:
+
+```bash
+obsigno verify signed.txt
 ```
 
 ### Ed25519 keypair

@@ -1,6 +1,7 @@
 node_modules
 package-lock.json
-obsigno.js
+obsigno.txt
+signed.txt
 keypair.json
 id.json
 *.pem

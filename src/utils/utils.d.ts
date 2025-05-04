@@ -29,4 +29,19 @@ declare module "obsigno" {
 	 * @returns {Uint8Array} The decoded binary data.
 	 */
 	export function decodeBase58(input: string): Uint8Array;
+
+	/**
+	 * Reads a text file and interprets the variables in it
+	 *
+	 * @param {string} filePath - Path to the file to be read
+	 * @returns {Object} Object with interpreted variables and the template content
+	 */
+	export function readAndInterpretMessageFile(
+		filePath: string,
+		publicKeyPath: string
+	): {
+		content: string;
+		variables: Record<string, string>;
+		template: string;
+	};
 }
