@@ -40,11 +40,11 @@ obsigno create --keypair YOUR_SECRET_KEY
 
 ### 2. Message file
 
-The message file is located in ~/.local/share/obsigno/obsigno.txt. Use obsigno.txt to change the message.
+The message file is located in ~/.local/share/obsigno/unsigned_message.txt. Use unsigned_message.txt to change the message.
 
-### 3. (Optional) Modify obsigno.txt
+### 3. (Optional) Modify unsigned_message.txt
 
-Create a custom message by modifying obsigno.txt:
+Create a custom message by modifying unsigned_message.txt:
 
 ```
 I, $PUBLIC_KEY, hereby certify and notarize this message.
@@ -83,7 +83,7 @@ $ACCESS_TOKEN
 
 ### Review message
 
-Review the obsigno.txt message before signing:
+Review the unsigned_message.txt message before signing:
 
 ```bash
 obsigno review
@@ -91,7 +91,7 @@ obsigno review
 
 ### Sign message
 
-When a message is signed, a text file is saved to ~/.local/state/obsigno/signed_obsigno_message.txt.
+When a message is signed, a text file is saved to ~/.local/state/obsigno/signed_message.txt.
 
 Sign the message:
 
