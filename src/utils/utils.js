@@ -1,5 +1,6 @@
 const fs = require("fs");
 const {
+	paths,
 	resolvePath,
 	toUint8Array,
 	encodeBase58,
@@ -7,7 +8,7 @@ const {
 	readPublicKey
 } = require("../module/internal");
 
-const interpretMessage = (filePath) => {
+const interpretMessage = (filePath = paths.storedMessagePath) => {
 	try {
 		let formattedPath = resolvePath(filePath);
 		if (!fs.existsSync(formattedPath)) {
@@ -43,19 +44,23 @@ const interpretMessage = (filePath) => {
 		const expirationMs =
 			hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
 		const expirationDate = new Date(timestamp + expirationMs).toISOString();
-		const accessCode = `?public_key=${publicKey}&signed_at=${timestamp}&expires_at=${timestamp + expirationMs}`;
+		const accessToken = content.includes("$ACCESS_TOKEN")
+			? `?public_key=${publicKey}&signed_at=${timestamp}&expires_at=${timestamp + expirationMs}`
+			: null;
 		let interpretedContent = content
 			.replace(/\$PUBLIC_KEY/g, publicKey)
 			.replace(/\$CURRENT_DATE/g, currentDate)
 			.replace(/\$EXPIRES_IN_([0-9]+H)?([0-9]+M)?([0-9]+S)?/g, expirationDate)
-			.replace(/\$ACCESS_CODE/g, accessCode);
+			.replace(/\$ACCESS_TOKEN/g, "")
+			.trim();
+
 		return {
 			content: interpretedContent,
 			variables: {
 				publicKey,
 				currentDate,
 				expirationDate,
-				accessCode,
+				accessToken,
 				expiresInValue,
 				expirationComponents: {
 					hours,
@@ -71,4 +76,36 @@ const interpretMessage = (filePath) => {
 	}
 };
 
-module.exports = { toUint8Array, encodeBase58, decodeBase58, interpretMessage };
+const formatMessage = ({ publicKey, message, signature, accessToken }) => {
+	const formattedAccessToken =
+		accessToken && accessToken.startsWith("?")
+			? encodeBase58(
+					new TextEncoder().encode(`${encodeBase58(signature)}${accessToken}`)
+				)
+			: accessToken;
+	const pubkeyStart = `\n----- START PUBLIC KEY -----\n`;
+	const pubkey = `${encodeBase58(publicKey)}`;
+	const pubkeyEnd = `\n----- END PUBLIC KEY -----\n`;
+	const messageStart = `\n----- START MESSAGE -----\n`;
+	const messageEnd = `\n----- END MESSAGE -----\n`;
+	const signatureStart = `\n----- START SIGNATURE -----\n`;
+	const signatureBase58 = signature ? `${encodeBase58(signature)}` : "";
+	const signatureEnd = `\n----- END SIGNATURE -----\n`;
+	const accessTokenStart = `\n----- START ACCESS TOKEN -----\n`;
+	const accessTokenEnd = `\n----- END ACCESS TOKEN -----\n`;
+	const signedMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}${signature ? `${signatureStart}${signatureBase58}${signatureEnd}` : ""}${accessToken ? `${accessTokenStart}${formattedAccessToken}${accessTokenEnd}` : ""}`;
+	return signedMessage;
+};
+
+const saveSignedMessage = (signedMessage) => {
+	fs.writeFileSync(paths.signedMessagePath, signedMessage.trim());
+};
+
+module.exports = {
+	toUint8Array,
+	encodeBase58,
+	decodeBase58,
+	interpretMessage,
+	formatMessage,
+	saveSignedMessage
+};

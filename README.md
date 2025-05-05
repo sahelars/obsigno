@@ -12,7 +12,7 @@ Edit a single txt file to quickly review and sign large messages. No complex set
 
 ## Persistent storage
 
-When `obsigno create --keypair` is run, a keypair is saved to the home directory as ~/.local/share/obsigno/data.json and ~/.config/obsigno/id.bin. The file for obsigno.txt is added in the current terminal directory when `obsigno create --message` is run.
+When `obsigno create --keypair` is run, a keypair is saved to the home directory as ~/.local/share/obsigno/data.json and ~/.config/obsigno/id.bin.
 
 ## Install
 
@@ -38,13 +38,9 @@ Or add existing secret key:
 obsigno create --keypair YOUR_SECRET_KEY
 ```
 
-### 2. Add obsigno.txt file
+### 2. Message file
 
-Add obsigno.txt to your preferred working directory:
-
-```bash
-obsigno create --message
-```
+The message file is located in ~/.local/share/obsigno/obsigno.txt. Use obsigno.txt to change the message.
 
 ### 3. (Optional) Modify obsigno.txt
 
@@ -56,7 +52,7 @@ I, $PUBLIC_KEY, hereby certify and notarize this message.
 Signed: $CURRENT_DATE
 Expires: $EXPIRES_IN_0H5M33S
 
-$ACCESS_CODE
+$ACCESS_TOKEN
 ```
 
 Returns the pubic key:
@@ -80,7 +76,7 @@ $EXPIRES_IN_12H0M0S
 Returns a URL-safe access code extension:
 
 ```
-$ACCESS_CODE
+$ACCESS_TOKEN
 ```
 
 ## Usage
@@ -93,24 +89,14 @@ Review the obsigno.txt message before signing:
 obsigno review
 ```
 
-Review a custom message.txt file before signing:
-
-```bash
-obsigno review message.txt
-```
-
 ### Sign message
+
+When a message is signed, a text file is saved to ~/.local/state/obsigno/signed_obsigno_message.txt.
 
 Sign the message:
 
 ```bash
 obsigno sign
-```
-
-Sign a custom message.txt file:
-
-```bash
-obsigno sign message.txt
 ```
 
 ### Verify message
@@ -119,12 +105,6 @@ Verify a signed message:
 
 ```bash
 obsigno verify
-```
-
-Verify a signed.txt file:
-
-```bash
-obsigno verify signed.txt
 ```
 
 ### Ed25519 keypair
