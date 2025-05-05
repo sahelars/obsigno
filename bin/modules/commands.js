@@ -115,18 +115,12 @@ const signCommand = () => {
 const verifyCommand = () => {
 	try {
 		const data = retrieveSignedMessage();
-		const formattedMessage = data.accessToken
-			? formatMessage({
-					publicKey: data.publicKey,
-					message: data.message,
-					signature: data.signature,
-					accessToken: data.accessToken
-				})
-			: formatMessage({
-					publicKey: data.publicKey,
-					message: data.message,
-					signature: data.signature
-				});
+		const formattedMessage = formatMessage({
+			publicKey: data.publicKey,
+			message: data.message,
+			signature: data.signature,
+			accessToken: data.accessToken
+		});
 		console.log(formattedMessage);
 		const verified = verifySignedMessage({
 			publicKey: data.publicKey,
@@ -134,9 +128,9 @@ const verifyCommand = () => {
 			signature: data.signature
 		});
 		if (verified) {
-			console.log("\n  ✅ Signature verified.\n");
+			console.log("\n  ✅ Signature is verified.\n");
 		} else {
-			console.log("\n  ❌ Unauthorized signature.\n");
+			console.log("\n  ❌ Signature is unauthorized.\n");
 		}
 	} catch (e) {
 		console.log(

@@ -79,7 +79,9 @@ const interpretMessage = (filePath = paths.storedMessagePath) => {
 const formatMessage = ({ publicKey, message, signature, accessToken }) => {
 	const formattedAccessToken =
 		accessToken && accessToken.startsWith("?")
-			? `${encodeBase58(signature)}${accessToken}`
+			? encodeBase58(
+					new TextEncoder().encode(`${encodeBase58(signature)}${accessToken}`)
+				)
 			: accessToken;
 	const pubkeyStart = `\n----- START PUBLIC KEY -----\n`;
 	const pubkey = `${encodeBase58(publicKey)}`;
@@ -90,12 +92,8 @@ const formatMessage = ({ publicKey, message, signature, accessToken }) => {
 	const signatureBase58 = signature ? `${encodeBase58(signature)}` : "";
 	const signatureEnd = `\n----- END SIGNATURE -----\n`;
 	const accessTokenStart = `\n----- START ACCESS TOKEN -----\n`;
-	const accessTokenExtended = formattedAccessToken;
-	const accessTokenEncoded = accessToken
-		? encodeBase58(new TextEncoder().encode(accessTokenExtended))
-		: "";
 	const accessTokenEnd = `\n----- END ACCESS TOKEN -----\n`;
-	const signedMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}${signature ? `${signatureStart}${signatureBase58}${signatureEnd}` : ""}${accessToken ? `${accessTokenStart}${accessTokenEncoded}${accessTokenEnd}` : ""}`;
+	const signedMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}${signature ? `${signatureStart}${signatureBase58}${signatureEnd}` : ""}${accessToken ? `${accessTokenStart}${formattedAccessToken}${accessTokenEnd}` : ""}`;
 	return signedMessage;
 };
 
