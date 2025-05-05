@@ -8,7 +8,7 @@ const {
 	formatToPEM
 } = require("../module/internal");
 
-function reviewMessage(filePath = paths.obsignoPath) {
+function reviewMessage(filePath = paths.templatePath) {
 	try {
 		const message = interpretMessage(filePath);
 		return message.content;
@@ -18,7 +18,7 @@ function reviewMessage(filePath = paths.obsignoPath) {
 	}
 }
 
-function retrieveSignedMessage(filePath = paths.obsignoPath) {
+function retrieveSignedMessage(filePath = "signed.txt") {
 	try {
 		let currentFilePath = resolvePath(filePath);
 		const fileContent = fs.readFileSync(currentFilePath, "utf8");
@@ -46,6 +46,24 @@ function retrieveSignedMessage(filePath = paths.obsignoPath) {
 		);
 		const publicKeyMatch = fileContent.match(publicKeyRegex);
 		const publicKey = publicKeyMatch ? publicKeyMatch[1] : null;
+
+		const accessTokenStart = "----- START ACCESS TOKEN -----\n";
+		const accessTokenEnd = "\n----- END ACCESS TOKEN -----";
+		const accessTokenRegex = new RegExp(
+			`${accessTokenStart}(.*?)${accessTokenEnd}`,
+			"s"
+		);
+		const accessTokenMatch = fileContent.match(accessTokenRegex);
+		const accessToken = accessTokenMatch ? accessTokenMatch[1] : null;
+
+		if (accessToken) {
+			return {
+				publicKey,
+				message,
+				signature,
+				accessToken
+			};
+		}
 
 		return {
 			publicKey,
@@ -78,21 +96,12 @@ function signMessage({ message, privateKey }) {
 	}
 }
 
-function verifyMessage({ filePath, publicKey, message, signature }) {
+function verifySignedMessage({ publicKey, message, signature }) {
 	try {
-		let currentPublicKey = publicKey;
-		let currentMessage = message;
-		let currentSignature = signature;
-		if (filePath) {
-			const retrievedMessage = retrieveSignedMessage(filePath);
-			currentPublicKey = retrievedMessage.publicKey;
-			currentMessage = retrievedMessage.message;
-			currentSignature = retrievedMessage.signature;
-		}
-		const signatureBuffer = toUint8Array(currentSignature);
-		const msgBuffer = Buffer.from(currentMessage, "utf8");
+		const signatureBuffer = toUint8Array(signature);
+		const msgBuffer = Buffer.from(message, "utf8");
 		const key = crypto.createPublicKey(
-			formatToPEM({ publicKey: currentPublicKey })
+			formatToPEM({ publicKey: publicKey })
 		);
 		return crypto.verify(null, msgBuffer, key, signatureBuffer);
 	} catch (e) {
@@ -105,5 +114,5 @@ module.exports = {
 	reviewMessage,
 	retrieveSignedMessage,
 	signMessage,
-	verifyMessage
+	verifySignedMessage
 };

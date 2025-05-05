@@ -43,19 +43,22 @@ const interpretMessage = (filePath) => {
 		const expirationMs =
 			hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
 		const expirationDate = new Date(timestamp + expirationMs).toISOString();
-		const accessCode = `?public_key=${publicKey}&signed_at=${timestamp}&expires_at=${timestamp + expirationMs}`;
+		const accessToken = content.includes("$ACCESS_TOKEN")
+			? `?public_key=${publicKey}&signed_at=${timestamp}&expires_at=${timestamp + expirationMs}`
+			: null;
 		let interpretedContent = content
 			.replace(/\$PUBLIC_KEY/g, publicKey)
 			.replace(/\$CURRENT_DATE/g, currentDate)
 			.replace(/\$EXPIRES_IN_([0-9]+H)?([0-9]+M)?([0-9]+S)?/g, expirationDate)
-			.replace(/\$ACCESS_CODE/g, accessCode);
+			.replace(/\$ACCESS_TOKEN/g, "")
+			.trim();
 		return {
 			content: interpretedContent,
 			variables: {
 				publicKey,
 				currentDate,
 				expirationDate,
-				accessCode,
+				accessToken,
 				expiresInValue,
 				expirationComponents: {
 					hours,

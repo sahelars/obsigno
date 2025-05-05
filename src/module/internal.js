@@ -4,6 +4,7 @@ const os = require("os");
 const path = require("path");
 
 const homeDir = os.homedir();
+const templatePath = path.resolve(__dirname, "../../template.txt");
 const configDir = path.join(homeDir, "/.config/obsigno");
 const dataDir = path.join(homeDir, "/.local/share/obsigno");
 if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });
@@ -17,7 +18,8 @@ const paths = {
 	idPath,
 	dataPath,
 	publicKeyPath,
-	obsignoPath
+	obsignoPath,
+	templatePath
 };
 
 const resolvePath = (filePath) => {

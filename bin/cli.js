@@ -7,8 +7,10 @@ const {
 	generateKeypair,
 	reviewMessage,
 	signMessage,
-	verifyMessage,
-	encodeBase58
+	retrieveSignedMessage,
+	verifySignedMessage,
+	encodeBase58,
+	interpretMessage
 } = require("../index.js");
 const { paths } = require("../src/module/internal");
 const path = require("path");
@@ -135,9 +137,11 @@ switch (command) {
 		try {
 			const keys = keypair();
 			const filePath = args[1] && args[1].includes(".txt") ? args[1] : null;
-			const msg = filePath ? reviewMessage(filePath) : reviewMessage();
+			const data = filePath
+				? interpretMessage(filePath)
+				: interpretMessage(paths.templatePath);
 			const signature = signMessage({
-				message: msg,
+				message: data.content,
 				privateKey: keys.privateKey
 			});
 			if (signature) {
@@ -145,12 +149,15 @@ switch (command) {
 				const pubkey = `${encodeBase58(keys.publicKey)}`;
 				const pubkeyEnd = `\n----- END PUBLIC KEY -----\n`;
 				const messageStart = `\n----- START MESSAGE -----\n`;
-				const message = `${msg}`;
+				const message = `${data.content}`;
 				const messageEnd = `\n----- END MESSAGE -----\n`;
 				const signatureStart = `\n----- START SIGNATURE -----\n`;
 				const signatureBase58 = `${encodeBase58(signature)}`;
 				const signatureEnd = `\n----- END SIGNATURE -----\n`;
-				const signedMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}${signatureStart}${signatureBase58}${signatureEnd}`;
+				const accessTokenStart = `\n----- START ACCESS TOKEN -----\n`;
+				const accessToken = `${data.variables.accessToken}`;
+				const accessTokenEnd = `\n----- END ACCESS TOKEN -----\n`;
+				const signedMessage = `${pubkeyStart}${pubkey}${pubkeyEnd}${messageStart}${message}${messageEnd}${signatureStart}${signatureBase58}${signatureEnd}${accessToken ? `${accessTokenStart}${accessToken}${accessTokenEnd}` : ""}`;
 				console.log(signedMessage);
 				fs.writeFileSync(
 					path.join(process.cwd(), "signed.txt"),
@@ -169,9 +176,13 @@ switch (command) {
 
 	case "verify":
 		try {
-			const filePath =
-				args[1] && args[1].includes(".txt") ? args[1] : "signed.txt";
-			const verified = verifyMessage({ filePath });
+			const filePath = args[1] && args[1].includes(".txt") ? args[1] : null;
+			const data = filePath ? retrieveSignedMessage(filePath) : retrieveSignedMessage();
+			const verified = verifySignedMessage({
+				publicKey: data.publicKey,
+				message: data.message,
+				signature: data.signature
+			});
 			if (verified) {
 				console.log("\n  ✅ Signature verified.\n");
 			} else {
