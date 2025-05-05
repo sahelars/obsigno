@@ -33,7 +33,7 @@ describe("Certify tests", () => {
 			message: messageString,
 			privateKey: keypair.privateKey
 		});
-		const verified = Certify.verifyMessage({
+		const verified = Certify.verifySignedMessage({
 			message: messageString,
 			publicKey: keypair.publicKey,
 			signature: signature
@@ -41,7 +41,7 @@ describe("Certify tests", () => {
 
 		expect(verified).to.be.true;
 		const wrongPublicKey = Keypair.generateKeypair().publicKey;
-		const failVerified = Certify.verifyMessage({
+		const failVerified = Certify.verifySignedMessage({
 			message: messageString,
 			publicKey: wrongPublicKey,
 			signature: signature
@@ -54,13 +54,13 @@ describe("Certify tests", () => {
 		const signature = Certify.signMessage({
 			message: messageString
 		});
-		const verified = Certify.verifyMessage({
+		const verified = Certify.verifySignedMessage({
 			message: messageString,
 			publicKey: keypair.publicKey,
 			signature: signature
 		});
 		expect(verified).to.be.true;
-		const verifiedBs58 = Certify.verifyMessage({
+		const verifiedBs58 = Certify.verifySignedMessage({
 			message: messageString,
 			publicKey: Utils.encodeBase58(keypair.publicKey),
 			signature: signature
