@@ -8,7 +8,7 @@ const {
 	formatToPEM
 } = require("../module/internal");
 
-function reviewMessage(filePath = paths.templatePath) {
+function reviewMessage(filePath = paths.storedMessagePath) {
 	try {
 		const message = interpretMessage(filePath);
 		return message.content;
@@ -18,7 +18,7 @@ function reviewMessage(filePath = paths.templatePath) {
 	}
 }
 
-function retrieveSignedMessage(filePath = "signed.txt") {
+function retrieveSignedMessage(filePath = paths.signedMessagePath) {
 	try {
 		let currentFilePath = resolvePath(filePath);
 		const fileContent = fs.readFileSync(currentFilePath, "utf8");
@@ -100,9 +100,7 @@ function verifySignedMessage({ publicKey, message, signature }) {
 	try {
 		const signatureBuffer = toUint8Array(signature);
 		const msgBuffer = Buffer.from(message, "utf8");
-		const key = crypto.createPublicKey(
-			formatToPEM({ publicKey: publicKey })
-		);
+		const key = crypto.createPublicKey(formatToPEM({ publicKey: publicKey }));
 		return crypto.verify(null, msgBuffer, key, signatureBuffer);
 	} catch (e) {
 		console.log(e.message);

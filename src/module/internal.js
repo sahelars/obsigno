@@ -4,22 +4,35 @@ const os = require("os");
 const path = require("path");
 
 const homeDir = os.homedir();
-const templatePath = path.resolve(__dirname, "../../template.txt");
+const templateMessagePath = path.resolve(__dirname, "../../template.txt");
+
 const configDir = path.join(homeDir, "/.config/obsigno");
-const dataDir = path.join(homeDir, "/.local/share/obsigno");
+const shareDir = path.join(homeDir, "/.local/share/obsigno");
+const stateDir = path.join(homeDir, "/.local/state/obsigno");
+
 if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(shareDir)) fs.mkdirSync(shareDir, { recursive: true });
+if (!fs.existsSync(stateDir)) fs.mkdirSync(stateDir, { recursive: true });
 
 const idPath = path.join(configDir, "id.bin");
-const dataPath = path.join(dataDir, "data.bin");
-const publicKeyPath = path.join(dataDir, "public.key");
-const obsignoPath = path.join(process.cwd(), "obsigno.txt");
+const dataPath = path.join(shareDir, "data.bin");
+const publicKeyPath = path.join(shareDir, "public.key");
+const storedMessagePath = path.join(shareDir, "obsigno.txt");
+const signedMessagePath = path.join(stateDir, "signed_obsigno_message.txt");
+
+if (!fs.existsSync(storedMessagePath))
+	fs.writeFileSync(
+		storedMessagePath,
+		fs.readFileSync(templateMessagePath, "utf8")
+	);
+
 const paths = {
 	idPath,
 	dataPath,
 	publicKeyPath,
-	obsignoPath,
-	templatePath
+	templateMessagePath,
+	storedMessagePath,
+	signedMessagePath
 };
 
 const resolvePath = (filePath) => {
@@ -155,8 +168,7 @@ const toUint8Array = (input) => {
 
 const encodeBase58 = (input) => {
 	if (!(input instanceof Uint8Array) && !Buffer.isBuffer(input)) {
-		console.log("Input must be a Uint8Array or Buffer");
-		return null;
+		return input;
 	}
 	let digits = [0];
 	for (let i = 0; i < input.length; ++i) {
