@@ -41,4 +41,28 @@ declare module "obsigno" {
 		variables: Record<string, string>;
 		template: string;
 	};
+
+	/**
+	 * Formats a message with a public key, signature, and access token.
+	 *
+	 * @param {Object} options - The options object containing:
+	 * @param {Uint8Array} options.publicKey - The public key.
+	 * @param {string} options.message - The message content.
+	 * @param {Uint8Array} [options.signature] - The signature.
+	 * @param {string} [options.accessToken] - The access token.
+	 * @returns {string} The formatted message.
+	 */
+	export function formatMessage(options: {
+		publicKey: Uint8Array;
+		message: string;
+		signature?: Uint8Array;
+		accessToken?: string;
+	}): string;
+
+	/**
+	 * Saves a signed message to a file.
+	 *
+	 * @param {string} signedMessage - The signed message to save.
+	 */
+	export function saveSignedMessage(signedMessage: string): void;
 }
