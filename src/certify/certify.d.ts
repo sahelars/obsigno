@@ -1,6 +1,6 @@
 declare module "obsigno" {
 	/**
-	 * Loads the custom message from the obsigno.txt file.
+	 * Loads the custom message from the unsigned_message.txt file.
 	 *
 	 * @param {string} [filePath] - The path to the message txt file.
 	 * @returns {string} The configured message.
@@ -8,7 +8,7 @@ declare module "obsigno" {
 	export function reviewMessage(filePath?: string): string;
 
 	/**
-	 * Retrieves a signed message from the obsigno.txt file.
+	 * Retrieves a signed message from the signed_message.txt file.
 	 *
 	 * @param {string} [filePath] - The path to the message txt file.
 	 * @returns {Object} The signed message.

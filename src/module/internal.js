@@ -17,8 +17,8 @@ if (!fs.existsSync(stateDir)) fs.mkdirSync(stateDir, { recursive: true });
 const idPath = path.join(configDir, "id.bin");
 const dataPath = path.join(shareDir, "data.bin");
 const publicKeyPath = path.join(shareDir, "public.key");
-const storedMessagePath = path.join(shareDir, "obsigno.txt");
-const signedMessagePath = path.join(stateDir, "signed_obsigno_message.txt");
+const storedMessagePath = path.join(shareDir, "unsigned_message.txt");
+const signedMessagePath = path.join(stateDir, "signed_message.txt");
 
 if (!fs.existsSync(storedMessagePath))
 	fs.writeFileSync(
